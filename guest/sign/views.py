@@ -1,10 +1,11 @@
 #-*- coding:utf-8 -*-
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from django.http import HttpResponse,HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from sign.models import Event,Guest
 from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
+
 
 # Create your views here.
 def index(request):
@@ -18,6 +19,7 @@ def event_manage(request):
 	username = request.session.get("user","")
 	return render(request,"event_manage.html",{"user":username,'events':event_list})
 
+#发布会搜索	
 @login_required
 def search_name(request):
 	username = request.session.get("user","")
@@ -25,6 +27,7 @@ def search_name(request):
 	search_name_bytes = search_name.encode(encoding = "utf-8")
 	event_list = Event.objects.filter(name__contains = search_name)
 	return render(request,"event_manage.html",{"user":username,"events":event_list})
+
 
 #嘉宾管理
 @login_required
@@ -43,6 +46,8 @@ def guest_manage(request):
 		contacts = paginator.page(paginator.num_pages)
 	return render(request,"guest_manage.html",{"user":username,"guests":contacts})
 
+
+#嘉宾搜索	
 @login_required
 def search_guest(request):
 	username = request.session.get("user","")
@@ -65,7 +70,31 @@ def search_guest(request):
 	print contacts
 	return render(request,"guest_manage.html",{"user":username,"guests":contacts})
 
+#签到页面
+@login_required
+def sign_index(request,event_id):
+	event = get_object_or_404(Event,id=event_id)
+	return render(request,"sign_index.html",{'event':event})
 
+#签到动作
+@login_required
+def sign_index_action(request,event_id):
+	event = get_object_or_404(Event,id=event_id)
+	phone = request.POST.get("phone","")
+	result = Guest.objects.filter(phone=phone)
+	if not result:
+		return render(request,"sign_index.html",{"event":event,"hint":"手机号为空或不存在"})
+	result = Guest.objects.filter(phone=phone,event_id=event_id)
+	if not result:
+		return render(request,"sign_index.html",{"event":event,"hint":"该用户未参加此次发布会"})
+	result = Guest.objects.get(phone=phone)
+	if result.sign:
+		return render(request,"sign_index.html",{"event":event,"hint":"已签到"})
+	else:
+		Guest.objects.filter(phone=phone).update(sign="1")
+		return render(request,"sign_index.html",{"event":event,"hint":"签到成功","guest":result})
+
+		
 
 #登录
 def login_action(request):
