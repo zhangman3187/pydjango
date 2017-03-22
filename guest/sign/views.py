@@ -99,13 +99,20 @@ def sign_index_action(request,event_id):
 #登录
 def login_action(request):
 	if request.method == 'POST':
-		username = request.POST.get('username','')
-		password = request.POST.get('password','')
+		username = request.POST.get("username","")
+		password = request.POST.get("password","")
 		user = auth.authenticate(username=username,password=password)
 		if user is not None:
 			auth.login(request,user)
-			request.session['user'] = username
-			response = HttpResponseRedirect('/event_manage/')
+			request.session["user"] = username
+			response = HttpResponseRedirect("/event_manage/")
 			return response
 		else:
-			return render(request,'index.html',{'error':'username or password error!'})
+			return render(request,"index.html",{"error":"用户名或密码错误"})
+
+#退出登录
+@login_required
+def logout(request):
+	auth.logout(request)
+	response = HttpResponseRedirect('/')
+	return response

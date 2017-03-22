@@ -3,7 +3,7 @@
 	{% load bootstrap3 %}
 	{% bootstrap_css %}
 	{% bootstrap_javascript %}
-	<title>Guest Manage Page</title>
+	<title>Sign Page</title>
 </head>
 <body role="document">
 	<!-- 导航栏 -->
@@ -29,6 +29,12 @@
 					<input name="phone" type="text" placeholder="输入手机号"class="form-control">
 				</div>
 				<button type="submit" class="btn btn-success">签到</button>
+				{% csrf_token %}
+				<font color="red">
+					<br>{{hint}}</br>
+					<br>{{guest.realname}}</br>
+					<br>{{guest.phone}}</br>
+				</font>
 			</form>
 		</div>
 	</div>
