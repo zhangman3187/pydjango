@@ -12,7 +12,7 @@ def index(request):
 	return render(request,"index.html")
 
 #发布会管理	
-@login_required
+#@login_required
 def event_manage(request):
 	#读取浏览器session
 	event_list = Event.objects.all()
@@ -20,7 +20,7 @@ def event_manage(request):
 	return render(request,"event_manage.html",{"user":username,'events':event_list})
 
 #发布会搜索	
-@login_required
+#@login_required
 def search_name(request):
 	username = request.session.get("user","")
 	search_name = request.GET.get("name","")
@@ -77,7 +77,7 @@ def sign_index(request,event_id):
 	return render(request,"sign_index.html",{'event':event})
 
 #签到动作
-@login_required
+#@login_required
 def sign_index_action(request,event_id):
 	event = get_object_or_404(Event,id=event_id)
 	phone = request.POST.get("phone","")
